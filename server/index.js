@@ -6,10 +6,12 @@ const port = 3042;
 app.use(cors());
 app.use(express.json());
 
+// random public keys
+
 const balances = {
-  "0x1": 100,
-  "0x2": 50,
-  "0x3": 75,
+  "03146679c54b50816e422865b1fe41517ee09feeb0b8e22e46b6170ffcaec74756": 100,
+  "029d241c3d54abf50e58bf52a7d894b1d86916ea60f61985f2016e84df39c1c753": 50,
+  "0376e99268d49586a48b56a639f7cb042426d88cc80844b7b61151c83c8913ccef": 75,
 };
 
 app.get("/balance/:address", (req, res) => {
