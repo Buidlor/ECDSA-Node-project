@@ -9,9 +9,9 @@ app.use(express.json());
 // random public keys
 
 const balances = {
-  "224a0724de941a90494aa12628f49d78c7f067bd": 100,
-  "029d241c3d54abf50e58bf52a7d894b1d86916ea60f61985f2016e84df39c1c753": 50,
-  "0376e99268d49586a48b56a639f7cb042426d88cc80844b7b61151c83c8913ccef": 75,
+  "a66045604e9dace389b29059570f5be8aa4001a5": 100,
+  "1d14f19cfbe7af8c2154d4abeeea14f82f3ba76b": 50,
+  "05503dc0c44ed4e2fbd09d513644c98d0c3c7571": 75,
 };
 
 app.get("/balance/:address", (req, res) => {
