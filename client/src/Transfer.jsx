@@ -9,13 +9,30 @@ function Transfer({ address, setBalance, pk }) {
   const [recipient, setRecipient] = useState("");
   const [hash, setHash] = useState(""); 
   const [signature, setSignature] = useState("");
-  const message = "hello world"
+  const [publicKey, setPublicKey] = useState("");
+  
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
+
+  async function hashMessage() {
+    const message = "hello world"
+    const hash = keccak256(utf8ToBytes(message))
+    setHash(hash) 
+    console.log("the message hash is ", hash)
+  }
+  
+
+  async function sign (){
+    const signature =  secp.secp256k1.sign(hash, pk);
+    setSignature(signature)
+    console.log("the signature is ", signature)
+  }
   
   async function transfer(evt) {
     evt.preventDefault();
-    console.log("private key (transfer) = ", pk)
+    const publicKey = secp.secp256k1.getPublicKey(pk);
+    setPublicKey(publicKey)
+    console.log("the public key is ", publicKey)
     //hash the message and then sign it
     hashMessage()
     sign()
@@ -27,6 +44,8 @@ function Transfer({ address, setBalance, pk }) {
         sender: address,
         amount: parseInt(sendAmount),
         recipient,
+        publicKey,
+        signature,
       });
       setBalance(balance);
     } catch (ex) {
@@ -34,19 +53,7 @@ function Transfer({ address, setBalance, pk }) {
     }
   }
 
-    async function hashMessage() {
-      const hash = keccak256(utf8ToBytes(message))
-      setHash(hash) 
-      console.log("the message hash is ", hash)
-    }
-    
 
-  async function sign (){
-     const signature =  secp.secp256k1.sign(hash, pk);
-    
-      setSignature(signature)
-      console.log("the signature is ", signature)
-  }
 
 
   return (

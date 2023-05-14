@@ -5,7 +5,7 @@ import { keccak256 } from 'ethereum-cryptography/keccak';
 
 
 
-function Wallet({ address, setAddress, balance, setBalance, pk, setPk }) {
+function Wallet({ address, setAddress, balance, setBalance, pk, setPk}) {
 
   const privKey1 = import.meta.env.VITE_PRIV_KEY_1;
   const privKey2 = import.meta.env.VITE_PRIV_KEY_2;
@@ -16,12 +16,13 @@ function Wallet({ address, setAddress, balance, setBalance, pk, setPk }) {
     "1d14f19cfbe7af8c2154d4abeeea14f82f3ba76b":  privKey2,
     "05503dc0c44ed4e2fbd09d513644c98d0c3c7571":  privKey3
  }
- 
+
 
   async function onChange(evt) {
     const pk = evt.target.value;
     setPk(pk);
     
+    const publicKey = secp.secp256k1.getPublicKey(pk);
     const address = toHex(keccak256(secp.secp256k1.getPublicKey(pk).slice(1)).slice(-20));
     setAddress(address);
     if (address) {

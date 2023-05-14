@@ -1,4 +1,8 @@
 const express = require("express");
+const secp = require("ethereum-cryptography/secp256k1");
+const  {keccak256} = require("ethereum-cryptography/keccak");
+const { utf8ToBytes } = require("ethereum-cryptography/utils");
+const { toHex } = require("ethereum-cryptography/utils");
 require("dotenv").config();
 const app = express();
 const cors = require("cors");
@@ -26,8 +30,13 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount } = req.body;
+  const { sender, recipient, amount, signature, publicKey } = req.body;
 
+  const messageHash = keccak256(utf8ToBytes("Hello World"))
+  console.log("publickey", publicKey);
+
+  const isSignatureValid =  secp.secp256k1.verify(signature,messageHash, toHex(publicKey));
+  console.log("is it signed ? ", isSignatureValid);
   setInitialBalance(sender);
   setInitialBalance(recipient);
 
@@ -49,3 +58,4 @@ function setInitialBalance(address) {
     balances[address] = 0;
   }
 }
+
