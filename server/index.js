@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const app = express();
 const cors = require("cors");
 const port = 3042;
@@ -6,7 +7,11 @@ const port = 3042;
 app.use(cors());
 app.use(express.json());
 
-// random public keys
+
+
+// PRIV_KEY_1 = "374f132c993b5cb4850348a50d25cb7da6df86b41ccbc7c3d0ecd67e935a2d4d"
+// PRIV_KEY_2 = "8c016714f3f8ef90f1d6582b798ced50ba81493a4edbf809c387f949ba9cde2f"
+// PRIV_KEY_3 = "c330060d884356d8e511584bd01749bdd181fb3a54870bfdcaa951509798bdbb"
 
 const balances = {
   "a66045604e9dace389b29059570f5be8aa4001a5": 100,

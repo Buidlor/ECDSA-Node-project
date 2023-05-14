@@ -10,7 +10,7 @@ import { useState } from "react";
 function App() {
   const [balance, setBalance] = useState(0);
   const [address, setAddress] = useState("");
-  const [message, setMessage] = useState("Hello its me");
+  
   const [pk, setPk] = useState("");
 
   return (
@@ -20,12 +20,10 @@ function App() {
         setBalance={setBalance}
         address={address}
         setAddress={setAddress}
-        message={message}
-        setMessage={setMessage}
         pk={pk}
         setPk={setPk}
       />
-      <Transfer setBalance={setBalance} address={address} />
+      <Transfer setBalance={setBalance} address={address} pk={pk} />
     </div>
   );
 }
