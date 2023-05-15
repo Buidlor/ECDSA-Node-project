@@ -23,7 +23,7 @@ function App() {
         pk={pk}
         setPk={setPk}
       />
-      <Transfer setBalance={setBalance} address={address} pk={pk} />
+      <Transfer setBalance={setBalance} address={address} pk={pk}  />
     </div>
   );
 }

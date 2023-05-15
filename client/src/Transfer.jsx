@@ -2,41 +2,48 @@ import { useState } from "react";
 import server from "./server";
 import { keccak256 } from "ethereum-cryptography/keccak";
 import { utf8ToBytes } from "ethereum-cryptography/utils";
+import { toHex } from "ethereum-cryptography/utils";
 import * as  secp from 'ethereum-cryptography/secp256k1';
 
 function Transfer({ address, setBalance, pk }) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
-  const [hash, setHash] = useState(""); 
   const [signature, setSignature] = useState("");
   const [publicKey, setPublicKey] = useState("");
   
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
-  async function hashMessage() {
-    const message = "hello world"
-    const hash = keccak256(utf8ToBytes(message))
-    setHash(hash) 
-    console.log("the message hash is ", hash)
-  }
-  
 
+  //sign messageHash with privateKey to get signature
   async function sign (){
-    const signature =  secp.secp256k1.sign(hash, pk);
+    const messageHash = "a33321f98e4ff1c283c76998f14f57447545d339b3db534c6d886decb4209f28";
+    const publicKey = secp.secp256k1.getPublicKey(pk);
+    setPublicKey(publicKey)
+    const signature = secp.secp256k1.sign(messageHash, pk);
     setSignature(signature)
-    console.log("the signature is ", signature)
+
+    //verify signature on clientside
+    const isSigned = secp.secp256k1.verify(signature, messageHash, publicKey);
+    console.log("isSigned", isSigned);
+
+    return {signature, publicKey}
   }
   
   async function transfer(evt) {
     evt.preventDefault();
-    const publicKey = secp.secp256k1.getPublicKey(pk);
-    setPublicKey(publicKey)
-    console.log("the public key is ", publicKey)
-    //hash the message and then sign it
-    hashMessage()
-    sign()
+    const {signature, publicKey} = await sign()
+    
+    // bigInt signature into string to send to server
+    let signatureString = {
+      r: signature.r.toString(),
+      s: signature.s.toString(),
+      recovery: signature.recovery.toString()
+    };
 
+    // publicKey into string to send to server
+    let publicKeyString = toHex(publicKey);
+    
     try {
       const {
         data: { balance },
@@ -44,12 +51,13 @@ function Transfer({ address, setBalance, pk }) {
         sender: address,
         amount: parseInt(sendAmount),
         recipient,
-        publicKey,
-        signature,
+        publicKey: publicKeyString,
+        signature: signatureString,
       });
       setBalance(balance);
     } catch (ex) {
-      alert(ex.response.data.message);
+      console.log(ex);
+      
     }
   }
 
