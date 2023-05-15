@@ -12,11 +12,6 @@ app.use(cors());
 app.use(express.json());
 
 
-
-// PRIV_KEY_1 = "374f132c993b5cb4850348a50d25cb7da6df86b41ccbc7c3d0ecd67e935a2d4d"
-// PRIV_KEY_2 = "8c016714f3f8ef90f1d6582b798ced50ba81493a4edbf809c387f949ba9cde2f"
-// PRIV_KEY_3 = "c330060d884356d8e511584bd01749bdd181fb3a54870bfdcaa951509798bdbb"
-
 const balances = {
   "a66045604e9dace389b29059570f5be8aa4001a5": 100,
   "1d14f19cfbe7af8c2154d4abeeea14f82f3ba76b": 50,
@@ -29,19 +24,39 @@ app.get("/balance/:address", (req, res) => {
   res.send({ balance });
 });
 
+// this function will convert the public key from hex to Uint8Array
+function fromHex(hex) {
+  const bytes = new Uint8Array(Math.ceil(hex.length / 2));
+  for (let i = 0; i < bytes.length; i++)
+    bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+  return bytes;
+}
+
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount, signature, publicKey } = req.body;
+  const { sender, recipient, amount, publicKey, signature } = req.body;
+  const messageHash = "a33321f98e4ff1c283c76998f14f57447545d339b3db534c6d886decb4209f28";
+  
+  let signatureBigInt = {
+    r: BigInt(signature.r),
+    s: BigInt(signature.s),
+    recovery: BigInt(signature.recovery)
+  };
 
-  const messageHash = keccak256(utf8ToBytes("Hello World"))
-  console.log("publickey", publicKey);
+  let publicKeyUint8Array = fromHex(publicKey);
 
-  const isSignatureValid =  secp.secp256k1.verify(signature,messageHash, toHex(publicKey));
-  console.log("is it signed ? ", isSignatureValid);
+  const isSigned =  secp.secp256k1.verify(signatureBigInt,messageHash, publicKeyUint8Array);
+ 
+  if (!isSigned) {
+    res.status(400).send({ message: "Invalid signature!" });
+    return;
+  }
+
   setInitialBalance(sender);
   setInitialBalance(recipient);
 
   if (balances[sender] < amount) {
     res.status(400).send({ message: "Not enough funds!" });
+    return;
   } else {
     balances[sender] -= amount;
     balances[recipient] += amount;
